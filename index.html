@@ -1,0 +1,344 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>并购风云 · ACQUIRE 60 周年纪念版</title>
+<link rel="stylesheet" href="css/style.css?v=0.9.0-demo" />
+<link rel="stylesheet" href="css/board.css?v=0.9.0-demo" />
+  <link rel="icon" href="assets/icons/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-32.png" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-180.png" />
+  <meta name="theme-color" content="#12171d" />
+<!-- 开屏：在首帧之前置位，避免先闪一下完整菜单。
+     自带 6 秒兜底，就算主脚本没跑起来，菜单也会自己回来，不会永久黑屏。 -->
+<script>
+  (function () {
+    var d = document.documentElement;
+    if (location.hash === '#game') return;          /* 直达桌面不播 */
+    d.classList.add('is-intro', 'intro-center', 'is-dim');
+    setTimeout(function () {
+      if (!d.classList.contains('is-intro')) return;
+      d.classList.remove('is-intro', 'intro-center', 'is-dim', 'intro-draw');
+      var m = document.querySelector('.brand-mark');
+      if (m) m.classList.add('settled');
+    }, 6000);
+  })();
+</script>
+</head>
+<body>
+<div class="bg-aurora" aria-hidden="true"></div>
+<div class="bg-orbs" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="bg-sheen" aria-hidden="true"></div>
+<div class="menu-stars" aria-hidden="true"></div>
+<div class="menu-ring" aria-hidden="true"></div>
+
+<!-- ============ 背景层 ============ -->
+<div class="bg-layer" aria-hidden="true">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow--a"></div>
+  <div class="bg-glow bg-glow--b"></div>
+  <div class="bg-tiles" id="bgTiles"></div>
+  <div class="bg-vignette"></div>
+</div>
+
+<!-- ==================================================================== -->
+<!-- 屏幕一：主菜单                                                        -->
+<!-- ==================================================================== -->
+<div class="screen screen--menu" id="screenMenu">
+
+  <main class="menu-screen">
+
+    <header class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="6" y="6" width="24" height="24" rx="4" />
+          <rect x="18" y="18" width="24" height="24" rx="4" class="brand-mark-b" />
+        </svg>
+      </div>
+      <h1 class="brand-title">并购风云</h1>
+      <p class="brand-sub">A C Q U I R E</p>
+      <span class="brand-badge">60 周年纪念版</span>
+  
+  </header>
+
+    <nav class="menu" id="menu">
+      <button class="menu-btn menu-btn--primary" data-action="start">
+        <span class="menu-btn-text">
+          <span class="menu-btn-label">开始游戏</span>
+          <span class="menu-btn-desc">建立酒店帝国，成为最后的赢家</span>
+        </span>
+        <span class="menu-btn-arrow" aria-hidden="true">→</span>
+      </button>
+
+      <button class="menu-btn" data-action="rules">
+        <span class="menu-btn-text">
+          <span class="menu-btn-label">游戏规则</span>
+          <span class="menu-btn-desc">回合流程 · 并购结算 · 边界判例</span>
+        </span>
+        <span class="menu-btn-arrow" aria-hidden="true">→</span>
+      </button>
+
+      <button class="menu-btn" data-action="gallery">
+        <span class="menu-btn-text">
+          <span class="menu-btn-label">艺术画廊</span>
+          <span class="menu-btn-desc">证券陈列室 · 股票证书与楼体剪影</span>
+        </span>
+        <span class="menu-btn-arrow" aria-hidden="true">→</span>
+      </button>
+
+      <button class="menu-btn" data-action="history">
+        <span class="menu-btn-text">
+          <span class="menu-btn-label">历史战绩</span>
+          <span class="menu-btn-desc">对局记录 · 走势与逐回合明细</span>
+        </span>
+        <span class="menu-btn-arrow" aria-hidden="true">→</span>
+      </button>
+
+      <button class="menu-btn" data-action="career">
+        <span class="menu-btn-text">
+          <span class="menu-btn-label">生涯与成就</span>
+          <span class="menu-btn-desc">商业画像 · 成就殿堂</span>
+        </span>
+        <span class="menu-btn-arrow" aria-hidden="true">→</span>
+      </button>
+
+      <button class="menu-btn" data-action="settings">
+        <span class="menu-btn-text">
+          <span class="menu-btn-label">设置</span>
+          <span class="menu-btn-desc">音效 · 动效 · 本地数据</span>
+        </span>
+        <span class="menu-btn-arrow" aria-hidden="true">→</span>
+      </button>
+
+      <button class="menu-btn" data-action="about">
+        <span class="menu-btn-text">
+          <span class="menu-btn-label">关于</span>
+          <span class="menu-btn-desc">版本信息与设计说明</span>
+        </span>
+        <span class="menu-btn-arrow" aria-hidden="true">→</span>
+      </button>
+    </nav>
+
+    <footer class="menu-footer">
+      <div class="companies" id="companies"></div>
+      <div class="meta">
+        <span class="version">v0.9.0-demo</span>
+        <span class="dot" aria-hidden="true">·</span>
+        <span class="hint">2–6 人 · 12×9 棋盘 · 7 家连锁酒店</span>
+      </div>
+    </footer>
+
+  </main>
+</div>
+
+<!-- ==================================================================== -->
+<!-- 屏幕：艺术画廊                                                        -->
+<!-- ==================================================================== -->
+<section class="screen screen--gallery" id="screenGallery" hidden>
+  <button class="ghost-btn gallery-back" id="galleryBack">← 返回</button>
+
+  <div class="gallery-stage" id="galleryStage">
+    <div class="gallery-wall" id="galleryWall"></div>
+  </div>
+</section>
+
+<!-- 取下画框后全屏展示的一层 -->
+<div class="art-veil" id="artVeil" hidden>
+  <div class="art-veil-inner" id="artVeilInner"></div>
+  <p class="art-veil-hint">点击任意处放回墙上</p>
+</div>
+
+<!-- ==================================================================== -->
+<!-- 屏幕二：游戏桌面                                                      -->
+<!-- ==================================================================== -->
+
+  <!-- 对局复盘：只读上帝视角 -->
+  
+
+
+  <!-- 历史战绩详情：整页数据分析，不弹窗 -->
+  <section class="screen screen--history" id="screenHistory" hidden>
+    <header class="history-top">
+      <button class="ghost-btn" id="historyBack">← 返回</button>
+      <span class="history-title" id="historyTitle">历史战绩</span>
+      <span class="history-meta" id="historyHint"></span>
+    </header>
+    <div class="history-scroll" id="historyBody"></div>
+  </section>
+
+  <div class="screen screen--game" id="screenGame" hidden>
+
+
+
+  <!-- 顶栏 -->
+  <header class="gamebar">
+    <button class="gamebar-back" id="btnBack" title="返回主菜单">
+      <span aria-hidden="true">←</span>
+    </button>
+
+    <div class="gamebar-info">
+      <span class="gamebar-mode" id="gameMode">经典模式</span>
+      <span class="gamebar-stats">
+        <span class="stat" data-tip="ui" data-term="round"><i>当前回合</i><b id="roundNo">1</b></span>
+        <span class="stat" data-tip="ui" data-term="safe"><i>安全规模</i><b>11</b></span>
+        <span class="stat" data-tip="ui" data-term="end"><i>终局触发</i><b>41</b></span>
+        <span class="stat" data-tip="ui" data-term="deck"><i>剩余板块</i><b id="deckLeft">108</b></span>
+      </span>
+
+      <span class="stat" title="本局时长"><b class="game-clock" id="gameClock">00:00:00</b></span>
+    </div>
+
+    <!-- 阶段显示器：夹在参数与按钮之间，自动居中，不会压住任何东西 -->
+    <div class="phase-track" id="phaseTrack">
+      <span class="phase-who" id="phaseWho">玩家 1</span>
+      <div class="phase-steps" id="phaseSteps">
+        <span class="phase-slider" id="phaseSlider"></span>
+        <span class="phase-step" data-phase="place">① 放置板块</span>
+        <span class="phase-step" data-phase="buy">② 购买股票</span>
+        <span class="phase-step" data-phase="draw">③ 补充手牌</span>
+      </div>
+    </div>
+
+    <div class="gamebar-actions">
+      <button class="ghost-btn" id="btnFlow">流程卡</button>
+      <button class="ghost-btn" id="btnRef">股东信息卡</button>
+      <button class="ghost-btn" id="btnRules">游戏规则</button>
+    </div>
+
+  </header>
+
+  <!-- 牌桌：左边是围坐的玩家 + 棋盘，右边是公司面板 -->
+  <div class="table">
+
+    <div class="table-main">
+
+      <!-- 对面席位 -->
+      <div class="seat-strip" id="seatsTop"></div>
+
+      <!-- 左右席位 + 棋盘（这一组整体收缩，席位紧贴棋盘） -->
+      <div class="table-mid">
+        <div class="table-center">
+          <div class="seat-rail" id="seatsLeft"></div>
+
+          <section class="board-area" id="boardArea">
+            <div class="board-frame" id="boardFrame">
+              <div class="board-cols" id="boardCols" aria-hidden="true"></div>
+              <div class="board-rows" id="boardRows" aria-hidden="true"></div>
+              <div class="board-grid" id="boardGrid" role="grid" aria-label="并购风云棋盘"></div>
+            </div>
+          </section>
+
+          <div class="seat-rail" id="seatsRight"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <aside class="sidebar">
+      <!-- 观战条：只在 body.is-watch 时显示。放在侧栏里，不压棋盘 -->
+      <div class="watch-bar" id="watchBar">
+        <div class="watch-row">
+          <button class="ghost-btn" id="watchPrev">◀</button>
+          <span class="watch-view" id="watchView">玩家 1</span>
+          <button class="ghost-btn" id="watchNext">▶</button>
+        </div>
+        <div class="watch-row watch-speed">
+          <span>思考</span>
+          <button class="ghost-btn" data-speed="0.5">慢</button>
+          <button class="ghost-btn" data-speed="1">标准</button>
+          <button class="ghost-btn" data-speed="3">快</button>
+        </div>
+      </div>
+
+      <h2 class="sidebar-title">连锁酒店</h2>
+      <div class="company-list" id="companyList"></div>
+    </aside>
+
+  </div>
+
+  <!-- 当前玩家的操作区 -->
+  <footer class="action-tray">
+    <!-- 行动倒计时：走完再给 5 秒宽限，仍无操作就自动代打 -->
+    <div class="turn-timer" id="turnTimer" hidden>
+      <i class="turn-timer-fill" id="turnTimerFill"></i>
+      <span class="turn-timer-text" id="turnTimerText"></span>
+    </div>
+
+    <div class="tray-player">
+      <div class="tray-avatar" id="trayAvatar">1</div>
+      <div class="tray-id">
+        <span class="tray-name" id="trayName">玩家 1</span>
+        <span class="tray-cash-value" id="cashValue">$6,000</span>
+      </div>
+    </div>
+
+    <div class="tray-hand">
+      <div class="tray-label">
+        手牌
+        <button class="discard-btn" id="btnDiscard" disabled title="弃掉选中的这块（每回合一次）">弃牌</button>
+      </div>
+      <div class="hand-tiles" id="handTiles"></div>
+    </div>
+
+    <div class="tray-holdings">
+      <div class="tray-label">
+        持股
+        <span class="tray-hint" id="holdingHint"></span>
+      </div>
+      <div class="holding-list" id="holdingList"></div>
+    </div>
+
+    <div class="tray-actions">
+      <button class="tray-buy" id="btnBuy">购买股票</button>
+      <button class="tray-end" id="btnEndTurn">结束回合</button>
+    </div>
+  </footer>
+
+</div>
+
+<!-- ============ 弹窗 ============ -->
+<div class="overlay" id="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-bar">
+      <span class="modal-bar-dot"></span>
+      <span class="modal-bar-title" id="modalBarTitle">事件</span>
+      <span class="modal-bar-hint">点此展开</span>
+      <span class="modal-bar-expand" aria-hidden="true">⤢</span>
+    </div>
+    <button class="modal-collapse" id="modalCollapse" aria-label="收起" title="收起为横幅">▾</button>
+    <button class="modal-close" id="modalClose" aria-label="关闭">×</button>
+    <h2 class="modal-title" id="modalTitle"></h2>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/sfx.js?v=0.9.0-demo"></script>
+<script src="js/engine.js?v=0.9.0-demo"></script>
+<script src="js/battle-log.js?v=0.9.0-demo"></script>
+<script src="js/ai-memory.js?v=0.9.0-demo"></script>
+<script src="js/ai.js?v=0.9.0-demo"></script>
+<script src="js/career.js?v=0.9.0-demo"></script>
+<script src="js/timer.js?v=0.9.0-demo"></script>
+<script src="js/merger.js?v=0.9.0-demo"></script>
+<script src="js/main.js?v=0.9.0-demo"></script>
+<script src="js/selectors.js?v=0.9.0-demo"></script>
+<script src="js/board-utils.js?v=0.9.0-demo"></script>
+<script src="js/board-certs.js?v=0.9.0-demo"></script>
+<script src="js/stock-ui.js?v=0.9.0-demo"></script>
+<script src="js/stock-disposal.js?v=0.9.0-demo"></script>
+<script src="js/sweep.js?v=0.9.0-demo"></script>
+<script src="js/board-view-companies.js?v=0.9.0-demo"></script>
+<script src="js/board-view-board.js?v=0.9.0-demo"></script>
+<script src="js/board-view-seats.js?v=0.9.0-demo"></script>
+<script src="js/board-view-hand.js?v=0.9.0-demo"></script>
+<script src="js/board-view-tray.js?v=0.9.0-demo"></script>
+<script src="js/tooltip.js?v=0.9.0-demo"></script>
+  <script src="js/history.js?v=0.9.0-demo"></script>
+  <script src="js/board.js?v=0.9.0-demo"></script>
+</body>
+</html>
+

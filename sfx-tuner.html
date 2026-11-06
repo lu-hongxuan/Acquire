@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>并购风云 · 音效调校台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #0b0e13;
+    --panel: #141a22;
+    --panel2: #10161d;
+    --line: #232c37;
+    --text: #d9dee6;
+    --dim: #7d8794;
+    --accent: #d4b062;
+    --accent2: #f0d79b;
+    --good: #5fbf8e;
+    --warn: #e8863a;
+    --red: #e5484d;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(80% 60% at 50% -10%, #1b2430 0%, var(--bg) 62%);
+    color: var(--text);
+    font: 14px/1.65 "Segoe UI", "Microsoft YaHei UI", system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    height: 100vh;
+  }
+
+  /* ---------------- 左侧声音列表 ---------------- */
+  .side {
+    background: linear-gradient(180deg, var(--panel2), #0a0d11);
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .side-head {
+    padding: 20px 18px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .side-head h1 {
+    margin: 0 0 3px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+  }
+  .side-head p {
+    margin: 0;
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    color: var(--dim);
+  }
+
+  .list { flex: 1; overflow-y: auto; padding: 8px; }
+  .list::-webkit-scrollbar { width: 8px; }
+  .list::-webkit-scrollbar-thumb { background: rgba(212,176,98,.32); border-radius: 8px; }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 9px 11px;
+    margin-bottom: 3px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: none;
+    color: var(--dim);
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.16s;
+  }
+  .item:hover { color: var(--text); background: rgba(255,255,255,.035); }
+  .item.is-on {
+    color: var(--text);
+    border-color: rgba(212,176,98,.5);
+    background: rgba(212,176,98,.1);
+  }
+  .item .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: rgba(255,255,255,.15);
+    flex: none;
+  }
+  .item.is-on .dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .item .name { flex: 1; }
+  .item .tuned {
+    font-size: 10px;
+    letter-spacing: .05em;
+    color: var(--accent);
+    opacity: 0;
+  }
+  .item.is-tuned .tuned { opacity: 1; }
+
+  /* ---------------- 右侧编辑区 ---------------- */
+  .main { display: flex; flex-direction: column; min-height: 0; }
+
+  .main-head {
+    padding: 18px 26px 14px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .main-title h2 {
+    margin: 0 0 2px;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .main-title p { margin: 0; font-size: 12px; color: var(--dim); }
+  .main-head .spacer { flex: 1; }
+
+  .hit {
+    flex: none;
+    padding: 11px 26px;
+    border-radius: 9px;
+    border: 1px solid var(--accent);
+    background: linear-gradient(180deg, #3a3324, #241f16);
+    color: var(--accent2);
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.16s;
+  }
+  .hit:hover { background: linear-gradient(180deg, #4a412c, #2c2519); box-shadow: 0 0 20px -6px var(--accent); }
+  .hit:active { transform: translateY(1px); }
+
+  .hit--ghost {
+    border-color: rgba(255,255,255,.14);
+    background: rgba(255,255,255,.03);
+    color: var(--dim);
+    font-weight: 500;
+  }
+  .hit--ghost:hover { color: var(--text); background: rgba(255,255,255,.06); box-shadow: none; }
+
+  .body { flex: 1; overflow-y: auto; padding: 20px 26px 30px; }
+  .body::-webkit-scrollbar { width: 10px; }
+  .body::-webkit-scrollbar-thumb { background: rgba(212,176,98,.3); border-radius: 8px; }
+
+  .card {
+    max-width: 760px;
+    margin-bottom: 16px;
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(20,26,34,.9), rgba(14,19,25,.95));
+  }
+  .card h3 {
+    margin: 0 0 4px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+  .card .hint { margin: 0 0 12px; font-size: 12px; color: var(--dim); }
+
+  /* 滑杆行 */
+  .row {
+    display: grid;
+    grid-template-columns: 78px 1fr 84px;
+    align-items: center;
+    gap: 14px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,.045);
+  }
+  .row:last-child { border-bottom: none; }
+  .row label { font-size: 13px; color: var(--dim); }
+  .row output {
+    text-align: right;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent2);
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, rgba(212,176,98,.75), rgba(255,255,255,.1));
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #f7e6b8, #c9a45c);
+    border: 1px solid rgba(0,0,0,.45);
+    box-shadow: 0 2px 6px rgba(0,0,0,.6);
+    cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #f7e6b8, #c9a45c);
+    border: 1px solid rgba(0,0,0,.45);
+    cursor: pointer;
+  }
+
+  /* 频谱示意 */
+  .wave {
+    height: 54px;
+    margin-top: 14px;
+    border-radius: 8px;
+    background: rgba(0,0,0,.28);
+    border: 1px solid rgba(255,255,255,.05);
+    overflow: hidden;
+  }
+  .wave svg { display: block; width: 100%; height: 100%; }
+
+  /* 底部动作条 */
+  .foot {
+    flex: none;
+    padding: 14px 26px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(180deg, rgba(16,22,29,.7), rgba(10,13,17,.95));
+  }
+  .foot .status {
+    flex: 1;
+    font-size: 12px;
+    color: var(--dim);
+    letter-spacing: .03em;
+  }
+  .foot .status b { color: var(--good); font-weight: 600; }
+
+  select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: #10161d;
+    color: var(--text);
+    font: inherit;
+    font-size: 12.5px;
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 84px;
+    transform: translate(-50%, 12px);
+    padding: 10px 20px;
+    border-radius: 9px;
+    border: 1px solid rgba(212,176,98,.5);
+    background: rgba(20,26,34,.97);
+    color: var(--accent2);
+    font-size: 12.5px;
+    letter-spacing: .04em;
+    opacity: 0;
+    pointer-events: none;
+    transition: all .25s;
+    z-index: 20;
+  }
+  .toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 780px) {
+    .app { grid-template-columns: 1fr; }
+    .side { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="side">
+    <div class="side-head">
+      <h1>音效调校台</h1>
+      <p>并购风云 · 12 种声音</p>
+    </div>
+    <div class="list" id="list"></div>
+  </aside>
+
+  <main class="main">
+    <div class="main-head">
+      <div class="main-title">
+        <h2 id="title">—</h2>
+        <p id="subtitle">—</p>
+      </div>
+      <div class="spacer"></div>
+      <button class="hit hit--ghost" id="resetOne">本项恢复默认</button>
+      <button class="hit" id="play">试听</button>
+    </div>
+
+    <div class="body">
+      <div class="card">
+        <h3>音色参数</h3>
+        <p class="hint">调的是参数，音色本体（波形、音符结构）和游戏里完全一致。</p>
+
+        <div class="row">
+          <label for="pitch">音高</label>
+          <input id="pitch" type="range" min="40" max="250" step="1" value="100">
+          <output id="pitchOut">×1.00</output>
+        </div>
+
+        <div class="row">
+          <label for="decay">余响</label>
+          <input id="decay" type="range" min="20" max="300" step="1" value="100">
+          <output id="decayOut">×1.00</output>
+        </div>
+
+        <div class="row">
+          <label for="reverb">混响</label>
+          <input id="reverb" type="range" min="0" max="100" step="1" value="0">
+          <output id="reverbOut">0%</output>
+        </div>
+
+        <div class="row">
+          <label for="volume">音量</label>
+          <input id="volume" type="range" min="0" max="200" step="1" value="100">
+          <output id="volumeOut">100%</output>
+        </div>
+
+        <div class="wave">
+          <svg id="waveSvg" viewBox="0 0 600 54" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>写入</h3>
+        <p class="hint">写入后刷新游戏页面即可生效。数据存在本机 localStorage（键名 <code id="keyName">acquire.sfxTune.v1</code>）。</p>
+        <div role="group" style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="hit" id="save">写入并应用</button>
+          <button class="hit hit--ghost" id="resetAll">全部恢复默认</button>
+          <button class="hit hit--ghost" id="exportBtn">导出 JSON</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="status" id="status">选择一个声音开始调校</div>
+      <select id="preset">
+        <option value="">载入预设…</option>
+        <option value="roomy">大厅（多混响）</option>
+        <option value="tight">紧凑（短促干净）</option>
+        <option value="deep">低沉（降调加长）</option>
+        <option value="bright">明亮（升调）</option>
+      </select>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/sfx.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  const NAMES = window.Sfx.SOUND_NAMES;
+  const META = {
+    ui:       { label: '按钮点击', desc: '通用界面按钮' },
+    hover:    { label: '悬停', desc: '鼠标移到可交互元素上' },
+    select:   { label: '选中手牌', desc: '点选手牌时' },
+    place:    { label: '落子', desc: '把板块放到棋盘上' },
+    draw:     { label: '抽牌', desc: '补充手牌' },
+    cash:     { label: '收钱', desc: '买股票、分红入账' },
+    found:    { label: '创立公司', desc: '新连锁酒店上市' },
+    merge:    { label: '并购开始', desc: '触发并购时的提示' },
+    error:    { label: '不合法', desc: '点了不能点的位置' },
+    win:      { label: '终局', desc: '对局结束的结算音' },
+    tick:     { label: '滑块咔哒', desc: '音量滑块拖动时' },
+    gong:     { label: '开局钟声', desc: '对局简报出现时的钟声' },
+  };
+
+  let current = NAMES[0];
+  let working = window.Sfx.getTuning();     // 工作副本，未写入之前不落地
+
+  const $ = (id) => document.getElementById(id);
+
+  const ctrls = {
+    pitch:  { el: $('pitch'),  out: $('pitchOut'),  fmt: (v) => '×' + (v / 100).toFixed(2) },
+    decay:  { el: $('decay'),  out: $('decayOut'),  fmt: (v) => '×' + (v / 100).toFixed(2) },
+    reverb: { el: $('reverb'), out: $('reverbOut'), fmt: (v) => v + '%' },
+    volume: { el: $('volume'), out: $('volumeOut'), fmt: (v) => v + '%' },
+  };
+
+  function isDefault(v) {
+    return v.pitch === 1 && v.decay === 1 && v.reverb === 0 && v.volume === 1;
+  }
+
+  /* ---------------- 列表 ---------------- */
+
+  function renderList() {
+    const box = $('list');
+    box.innerHTML = NAMES.map((n) => {
+      const meta = META[n] || { label: n };
+      const t = working[n];
+      return '<button class="item' + (n === current ? ' is-on' : '')
+        + (isDefault(t) ? '' : ' is-tuned') + '" data-name="' + n + '">'
+        + '<span class="dot"></span>'
+        + '<span class="name">' + meta.label + '</span>'
+        + '<span class="tuned">改</span>'
+        + '</button>';
+    }).join('');
+
+    box.querySelectorAll('.item').forEach((el) => {
+      el.addEventListener('click', () => {
+        current = el.dataset.name;
+        renderList();
+        loadPanel();
+      });
+    });
+  }
+
+  /* ---------------- 参数面板 ---------------- */
+
+  function loadPanel() {
+    const meta = META[current] || { label: current, desc: '' };
+    $('title').textContent = meta.label;
+    $('subtitle').textContent = meta.desc + ' · ' + current;
+
+    const t = working[current];
+    ctrls.pitch.el.value = Math.round(t.pitch * 100);
+    ctrls.decay.el.value = Math.round(t.decay * 100);
+    ctrls.reverb.el.value = Math.round(t.reverb * 100);
+    ctrls.volume.el.value = Math.round(t.volume * 100);
+    refreshOutputs();
+    drawWave();
+  }
+
+  function refreshOutputs() {
+    Object.keys(ctrls).forEach((k) => {
+      const c = ctrls[k];
+      c.out.textContent = c.fmt(Number(c.el.value));
+    });
+  }
+
+  function readPanel() {
+    return {
+      pitch: Number(ctrls.pitch.el.value) / 100,
+      decay: Number(ctrls.decay.el.value) / 100,
+      reverb: Number(ctrls.reverb.el.value) / 100,
+      volume: Number(ctrls.volume.el.value) / 100,
+    };
+  }
+
+  /* ---------------- 波形示意 ---------------- */
+
+  function drawWave() {
+    const p = readPanel();
+    const svg = $('waveSvg');
+    const W = 600, H = 54, mid = H / 2;
+
+    const cycles = 3.2 * p.pitch * 4;
+    const amp = (H * 0.36) * Math.min(1.2, p.volume);
+    const decayLen = 1 + p.decay;
+
+    let d = '';
+    for (let x = 0; x <= W; x++) {
+      const u = x / W;
+      const env = Math.pow(1 - u, 1.6 / decayLen);
+      const y = mid + Math.sin(u * Math.PI * 2 * cycles) * amp * env;
+      d += (x === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }
+
+    const reverbOpacity = 0.06 + p.reverb * 0.34;
+
+    svg.innerHTML =
+      '<rect width="' + W + '" height="' + H + '" fill="rgba(212,176,98,' + reverbOpacity + ')"/>'
+      + '<line x1="0" y1="' + mid + '" x2="' + W + '" y2="' + mid + '" stroke="rgba(255,255,255,.12)"/>'
+      + '<path d="' + d + '" fill="none" stroke="#d4b062" stroke-width="1.6"/>';
+  }
+
+  /* ---------------- 试听 ---------------- */
+
+  let toastTimer = null;
+  function toast(msg) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.classList.add('is-on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('is-on'), 1600);
+  }
+
+  function playCurrent() {
+    const p = readPanel();
+    window.Sfx.setEnabled(true);
+    window.Sfx.preview(current, p);
+    $('status').textContent = '已试听：' + (META[current] || {}).label;
+  }
+
+  /* ---------------- 事件 ---------------- */
+
+  Object.keys(ctrls).forEach((k) => {
+    ctrls[k].el.addEventListener('input', () => {
+      refreshOutputs();
+      drawWave();
+      working[current] = readPanel();
+      renderList();
+    });
+  });
+
+  $('play').addEventListener('click', playCurrent);
+
+  $('resetOne').addEventListener('click', () => {
+    working[current] = { pitch: 1, decay: 1, reverb: 0, volume: 1 };
+    loadPanel();
+    renderList();
+    toast('已恢复这一项');
+  });
+
+  $('save').addEventListener('click', () => {
+    // 把当前面板的值先并进工作副本
+    working[current] = readPanel();
+    window.Sfx.saveTuning(working);
+    working = window.Sfx.getTuning();
+    renderList();
+    renderList();
+    $('status').innerHTML = '已写入 · 刷新游戏页面即可生效 · <b>' + new Date().toLocaleTimeString() + '</b>';
+    toast('已写入，去刷新游戏吧');
+  });
+
+  $('resetAll').addEventListener('click', () => {
+    if (!confirm('把所有声音恢复默认？')) return;
+    window.Sfx.resetTuning();
+    working = window.Sfx.getTuning();
+    renderList();
+    loadPanel();
+    toast('全部已恢复默认');
+  });
+
+  $('exportBtn').addEventListener('click', () => {
+    working[current] = readPanel();
+    const text = JSON.stringify(working, null, 2);
+    const blob = new Blob([text], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'sfx-tune.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast('JSON 已导出');
+  });
+
+  $('preset').addEventListener('change', (e) => {
+    const v = e.target.value;
+    if (!v) return;
+
+    const presets = {
+      roomy:  { reverb: 0.65, decay: 1.3, pitch: 1, volume: 1 },
+      tight:  { reverb: 0.05, decay: 0.55, pitch: 1.08, volume: 1 },
+      deep:   { reverb: 0.3, decay: 1.6, pitch: 0.78, volume: 1 },
+      bright: { reverb: 0.15, decay: 0.9, pitch: 1.32, volume: 1 },
+    };
+    const p = presets[v];
+    if (!p) return;
+
+    NAMES.forEach((n) => { working[n] = Object.assign({}, p); });
+    renderList();
+    loadPanel();
+    $('status').textContent = '已套用预设，记得点「写入并应用」';
+    e.target.value = '';
+  });
+
+  $('keyName').textContent = window.Sfx.TUNE_KEY;
+
+  /* ---------------- 启动 ---------------- */
+
+  renderList();
+  loadPanel();
+
+  document.addEventListener('pointerdown', function once() {
+    window.Sfx.setEnabled(true);
+    document.removeEventListener('pointerdown', once);
+  });
+})();
+</script>
+</body>
+</html>
