@@ -1,39 +1,67 @@
 # Acquire · 60th Anniversary Edition
 
-零依赖的《并购风云》浏览器版（ACQUIRE 60 周年纪念版）。纯 HTML / CSS / 原生 JS，双击 `index.html` 即玩，无需构建、无需服务器、无需联网。
+A zero-dependency browser implementation of the classic board game **Acquire** (60th Anniversary Edition).
 
-A zero-dependency browser implementation of the classic board game **Acquire** (60th Anniversary Edition). Open `index.html` and play — no build step, no server, no network, no npm packages.
+Open `index.html` and play. No build step, no server, no network, no npm packages.
 
-## 功能
+![Main menu](docs/images/menu.png)
 
-- 完整规则引擎：回合三阶段（放置板块 → 购买股票 → 补充手牌）、并购结算（白板不计规模、名次按占位顺延、逐张处理股票）、终局结算
-- 经典模式与大亨模式，分红金额严格对应实体「股东信息卡」
-- 三档 AI 难度，覆盖出牌、买股、平局裁决、股票处置四条决策链
-- 2–6 人本地热座，另有全 AI 观战模式
-- 逐回合复盘帧、生涯数据与 30 项成就，全部保存在本地
-- Web Audio 实时合成音效，无任何音频文件
+![Game board](docs/images/game.png)
 
-## 怎么玩
+## Features
 
-1. 下载或克隆本仓库
-2. 双击 `index.html`
+- **Full rules engine** — three-phase turns (place a tile → buy stock → draw), mergers with white-tile handling, ranked dividend seating, per-share stock disposal, endgame settlement
+- **Classic and Tycoon modes** — dividend tables match the physical shareholder card
+- **Three AI difficulty levels** — covering tile placement, stock purchases, tie-breaking and stock disposal, with memory of past failures and tile weights
+- **2–6 player hot-seat** — plus a full-AI spectate mode
+- **Replay frames, career stats and 30 achievements** — stored locally in the browser
+- **Sound** — synthesized in real time with the Web Audio API, no audio files
 
-界面为中文，规则全文见 [`规则书.md`](规则书.md)。
+## Play
 
-## 目录结构
+1. Download or clone this repository
+2. Double-click `index.html`
+
+The interface is in Chinese. The full rulebook is available at [`规则书.md`](规则书.md) (written in Chinese).
+
+> 零依赖的《并购风云》浏览器版（ACQUIRE 60 周年纪念版）。
+> 纯 HTML / CSS / 原生 JS，双击 `index.html` 即玩，无需构建、无需服务器、无需联网。
+
+## More screens
+
+<table>
+  <tr>
+    <td><img src="docs/images/merger.png" alt="Merger resolution" /></td>
+    <td><img src="docs/images/career.png" alt="Career and achievements" /></td>
+  </tr>
+  <tr>
+    <td align="center">Merger resolution</td>
+    <td align="center">Career &amp; achievements</td>
+  </tr>
+</table>
+
+## Structure
 
 ```
-index.html          游戏入口
-css/                样式表
-js/                 23 个模块，按顺序以普通 <script> 标签加载
-tests/              Node 测试文件，无依赖
-规则书.md            完整规则
-sfx-tuner.html      独立的音效调校页
+index.html          entry point
+css/                stylesheets
+js/                 23 modules, loaded in order via plain <script> tags
+tests/              Node test files (no dependencies)
+docs/images/        screenshots
+规则书.md            full rulebook (Chinese)
+sfx-tuner.html      standalone sound-tuning page
 ```
 
-架构分层：纯规则引擎（`js/engine.js`，不碰 DOM）、只读数据层（`js/selectors.js`）、AI 决策层（`js/ai.js`）、表现层（`js/board.js` 及各 view 模块）。玩家与 AI 共用同一条代码路径，差别只在「谁触发」。
+The architecture is layered:
 
-## 测试
+- **Rules engine** (`js/engine.js`) — pure logic, no DOM access
+- **Data layer** (`js/selectors.js`) — read-only pure functions
+- **AI** (`js/ai.js`, `js/ai-memory.js`) — all decision making
+- **Presentation** (`js/board.js` and view modules) — rendering and interaction
+
+Players and AI share the same code paths — the only difference is who triggers them.
+
+## Tests
 
 ```sh
 node tests/engine.test.js
@@ -41,6 +69,8 @@ node tests/merger.test.js
 node tests/selectors.test.js
 ```
 
-## 许可
+The full suite is 9 files / 275 assertions.
 
-保留所有权利。本仓库仅供查看与个人试玩。
+## License
+
+All rights reserved. Published for viewing and personal play.
