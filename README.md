@@ -1,12 +1,12 @@
-# Acquire · 60th Anniversary Edition
+﻿# Acquire · 60th Anniversary Edition
 
 A zero-dependency browser implementation of the classic board game **Acquire** (60th Anniversary Edition).
 
 Open `index.html` and play. No build step, no server, no network, no npm packages.
 
-![Main menu](docs/images/menu.png)
+![Main menu](docs/images/menu.jpg)
 
-![Game board](docs/images/game.png)
+![Game board](docs/images/game.jpg)
 
 ## Features
 
@@ -31,8 +31,8 @@ The interface is in Chinese. The full rulebook is available at [`规则书.md`](
 
 <table>
   <tr>
-    <td><img src="docs/images/merger.png" alt="Merger resolution" /></td>
-    <td><img src="docs/images/career.png" alt="Career and achievements" /></td>
+    <td><img src="docs/images/merger.jpg" alt="Merger resolution" /></td>
+    <td><img src="docs/images/career.jpg" alt="Career and achievements" /></td>
   </tr>
   <tr>
     <td align="center">Merger resolution</td>
